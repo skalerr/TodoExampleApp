@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todoist/classes/todo.dart';
+import 'package:todoist/main.dart';
 
 class TodoItem extends StatelessWidget {
-  const TodoItem(
-      {super.key,
-      required this.todo,
-      required this.onTodoChanged,
-      required this.onRemoveTodo});
-
-  final void Function(Todo todo) onTodoChanged;
-  final void Function(Todo todo) onRemoveTodo;
+  const TodoItem({super.key, required this.todo});
   final Todo todo;
 
   TextStyle? _getTextStyle(bool checked) {
@@ -21,15 +16,17 @@ class TodoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyTodoListState>();
+
     return ListTile(
       onTap: () {
-        onTodoChanged(todo);
+        appState.checkTodo(todo);
       },
       leading: Checkbox(
         checkColor: Colors.greenAccent,
         value: todo.completed,
         onChanged: (value) {
-          onTodoChanged(todo);
+          appState.checkTodo(todo);
         },
       ),
       title: Row(
@@ -42,7 +39,7 @@ class TodoItem extends StatelessWidget {
           ),
           IconButton(
             onPressed: () {
-              onRemoveTodo(todo);
+              appState.removeTodoItem(todo);
             },
             icon: const Icon(
               Icons.delete,

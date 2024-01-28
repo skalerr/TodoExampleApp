@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todoist/classes/todo.dart';
+import 'package:todoist/main.dart';
 import 'package:todoist/widgets/todo_item.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,40 +14,84 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<Todo> _todos = <Todo>[
-    Todo(title: 'Что бы добавить, нажми плюсик', completed: false)
-  ];
-  final TextEditingController _textEditingController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyTodoListState>();
 
-  void _addTodoItem(String name) {
-    setState(() {
-      if (name.isEmpty) return;
-
-      _todos.add(Todo(title: name, completed: false));
-    });
-    _textEditingController.clear();
-  }
-
-  void _removeTodoItem(Todo todo) {
-    setState(() {
-      _todos.removeWhere((element) => element.title == todo.title);
-    });
-  }
-
-  void _checkTodo(Todo todo) {
-    setState(() {
-      todo.completed = !todo.completed;
-    });
+    const double textSize = 22;
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: appState.todos.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final Todo todo = appState.todos[index];
+                      return TodoItem(
+                        todo: todo,
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextField(
+                          controller: appState.textEditingController,
+                          decoration: const InputDecoration(
+                            hintText: 'Type something...',
+                            border: OutlineInputBorder(),
+                          ),
+                          onSubmitted: appState.addTodoItem,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: TextButton(
+                    child: const Padding(
+                      padding: EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        "Добавить",
+                        style: TextStyle(fontSize: textSize),
+                      ),
+                    ),
+                    onPressed: () {
+                      appState.addTodoItem(appState.textEditingController.text);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => _displayDialog(), //_addTodoItem(),
+      //   child: const Icon(Icons.add),
+      // ),
+    );
   }
 
   Future<void> _displayDialog() async {
+    var appState = context.watch<MyTodoListState>();
+
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Add a todo'),
           content: TextField(
-            controller: _textEditingController,
+            controller: appState.textEditingController,
             decoration: const InputDecoration(hintText: 'Type your todo'),
             autofocus: true,
           ),
@@ -69,76 +115,13 @@ class _HomePageState extends State<HomePage> {
               ),
               onPressed: () {
                 Navigator.of(context).pop();
-                _addTodoItem(_textEditingController.text);
+                appState.addTodoItem(appState.textEditingController.text);
               },
               child: const Text('Add'),
             ),
           ],
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    const double textSize = 22;
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                itemCount: _todos.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final Todo todo = _todos[index];
-                  return TodoItem(
-                    todo: todo,
-                    onTodoChanged: _checkTodo,
-                    onRemoveTodo: _removeTodoItem,
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      controller: _textEditingController,
-                      decoration: const InputDecoration(
-                        hintText: 'Type something...',
-                        border: OutlineInputBorder(),
-                      ),
-                      onSubmitted: _addTodoItem,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: TextButton(
-                child: const Padding(
-                  padding: EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    "Добавить",
-                    style: TextStyle(fontSize: textSize),
-                  ),
-                ),
-                onPressed: () {
-                  _addTodoItem(_textEditingController.text);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => _displayDialog(), //_addTodoItem(),
-      //   child: const Icon(Icons.add),
-      // ),
     );
   }
 }
