@@ -1,0 +1,8 @@
+{
+  "configurations": [
+    {
+      "debugExternalPackageLibraries": false,
+      "dart.debugSdkLibraries": false
+    }
+  ]
+}
