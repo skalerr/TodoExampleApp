@@ -19,6 +19,8 @@ class _HomePageState extends State<HomePage> {
 
   void _addTodoItem(String name) {
     setState(() {
+      if (name.isEmpty) return;
+
       _todos.add(Todo(title: name, completed: false));
     });
     _textEditingController.clear();
@@ -82,59 +84,61 @@ class _HomePageState extends State<HomePage> {
     const double textSize = 22;
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: ListView(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            children: _todos.map((Todo todo) {
-              return TodoItem(
-                todo: todo,
-                onTodoChanged: _checkTodo,
-                onRemoveTodo: _removeTodoItem,
-              );
-            }).toList(),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _displayDialog(), //_addTodoItem(),
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  Widget _buildBottomSheet() {
-    TextEditingController _textController = TextEditingController();
-
-    return Container(
-      padding: const EdgeInsets.all(15.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(15.0),
-          topRight: Radius.circular(15.0),
-        ),
-      ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: TextField(
-              controller: _textController,
-              decoration: InputDecoration(
-                hintText: 'Введите что-то...',
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: _todos.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final Todo todo = _todos[index];
+                  return TodoItem(
+                    todo: todo,
+                    onTodoChanged: _checkTodo,
+                    onRemoveTodo: _removeTodoItem,
+                  );
+                },
               ),
             ),
-          ),
-          IconButton(
-            icon: Icon(Icons.send),
-            onPressed: () {
-              // Обработка отправки текста из поля ввода
-              String text = _textController.text;
-              // Добавьте вашу логику отправки текста здесь
-              _textController.clear();
-            },
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: TextField(
+                      controller: _textEditingController,
+                      decoration: const InputDecoration(
+                        hintText: 'Type something...',
+                        border: OutlineInputBorder(),
+                      ),
+                      onSubmitted: _addTodoItem,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: TextButton(
+                child: const Padding(
+                  padding: EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    "Добавить",
+                    style: TextStyle(fontSize: textSize),
+                  ),
+                ),
+                onPressed: () {
+                  _addTodoItem(_textEditingController.text);
+                },
+              ),
+            ),
+          ],
+        ),
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => _displayDialog(), //_addTodoItem(),
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 }
