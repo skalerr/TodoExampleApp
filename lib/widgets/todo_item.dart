@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todoist/classes/todo.dart';
 import 'package:todoist/main.dart';
+import 'package:todoist/widgets/my-custom-checkbox.dart';
+import 'package:todoist/widgets/switch-example.dart';
 
 class TodoItem extends StatelessWidget {
   const TodoItem({super.key, required this.todo});
@@ -22,9 +24,8 @@ class TodoItem extends StatelessWidget {
       onTap: () {
         appState.checkTodo(todo);
       },
-      leading: Checkbox(
-        checkColor: Colors.greenAccent,
-        value: todo.completed,
+      leading: MyCustomCheckBox(
+        isChecked: todo.completed,
         onChanged: (value) {
           appState.checkTodo(todo);
         },
