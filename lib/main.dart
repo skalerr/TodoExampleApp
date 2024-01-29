@@ -35,7 +35,7 @@ class MyTodoListState extends ChangeNotifier {
   final TextEditingController textEditingController = TextEditingController();
 
   void addTodoItem(String name) {
-    if (name.isEmpty) return;
+    if (name.isEmpty || name.trim().isEmpty) return;
 
     todos.add(Todo(title: name, completed: false));
     textEditingController.clear();
